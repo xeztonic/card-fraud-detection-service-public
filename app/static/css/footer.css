@@ -1,0 +1,82 @@
+/* Shared footer shown on all pages */
+.site-footer {
+    width: 100%;
+    background: #07152d;
+    color: #f8fafc;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    padding: 18px 32px;
+    margin-top: 40px;
+    box-sizing: border-box;
+}
+
+/* Footer column */
+.footer-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 64px;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+
+
+/* Left column title */
+.footer-left {
+    color: #e5e7eb;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+/* Center column logo */
+.footer-logo {
+    height: 100px;
+    width: auto;
+    display: block;
+}
+
+/* Right column contact */
+.footer-right {
+    flex-direction: column;
+    gap: 4px;
+}
+
+.footer-contact-title {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.footer-contact-email {
+    color: #93c5fd;
+    text-decoration: none;
+    font-size: 0.98rem;
+    font-weight: 600;
+}
+
+.footer-contact-email:hover {
+    text-decoration: underline;
+}
+
+/* Responsive footer */
+@media (max-width: 850px) {
+    .site-footer {
+        grid-template-columns: 1fr;
+        row-gap: 12px;
+        padding: 22px;
+    }
+
+    .footer-block {
+        min-height: auto;
+        padding: 8px 0;
+    }
+
+    .footer-block:not(:last-child) {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    }
+}

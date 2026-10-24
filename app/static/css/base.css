@@ -1,0 +1,33 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fb;
+    color: #111827;
+}
+
+button,
+.btn,
+a,
+summary,
+.file-upload-label,
+.modal-file-label,
+.info-btn,
+.side-info-btn,
+.side-action,
+.live-btn {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+}
+
+.error-message {
+    margin-top: 15px;
+    color: red;
+    text-align: center;
+}

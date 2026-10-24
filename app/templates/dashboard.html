@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='images/logo.png') }}"
+    />
+    <title>Fraud Detection Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+
+<body
+    data-dashboard-url="{{ url_for('dashboard') }}"
+    data-live-step-url="{{ url_for('live_step') }}"
+    data-live-table-url="{{ url_for('live_table_data') }}"
+    data-live-chart-url="{{ url_for('live_chart_data') }}"
+    data-live-stats-url="{{ url_for('live_stats') }}"
+  >
+    <div class="navbar">
+      <div class="page-title">
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="Fraud Detection Logo"
+          class="page-logo"
+        />
+
+        <h2>Fraud Detection Dashboard</h2>
+      </div>
+
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+
+    <div class="dashboard-container">
+      <div class="cards">
+        <div class="card">
+          <h3>Total Transactions</h3>
+          <p id="totalTransactionsValue">{{ total_transactions }}</p>
+        </div>
+
+        <div class="card">
+          <h3>Average Risk Score</h3>
+          <p id="averageRiskScoreValue">{{ average_risk_score }}</p>
+        </div>
+
+        <div class="card">
+          <h3>Alerts Sent</h3>
+          <p id="alertsSentValue">{{ alerts_sent }}</p>
+        </div>
+
+        <div class="card">
+          <h3>High Risk Rate</h3>
+          <p><span id="highRiskRateValue">{{ high_risk_rate }}</span>%</p>
+        </div>
+      </div>
+
+      {% if request.args.get("imported") %}
+      <p id="importMessage" class="alert-success dashboard-message">
+        {{ request.args.get("imported") }} historical transactions were imported successfully.
+      </p>
+      {% endif %}
+
+      {% if request.args.get("import_error") %}
+      <p id="importMessage" class="alert-error dashboard-message">
+        {{ request.args.get("import_error") }}
+      </p>
+      {% endif %}
+
+      <div class="side-menu">
+        <div class="side-menu-tab">
+          <span>Actions</span>
+        </div>
+
+        <div class="side-menu-content">
+          <h4>Dashboard Actions</h4>
+
+          <a href="{{ url_for('simulate') }}" class="side-action primary-side">
+            Simulate Transaction
+          </a>
+
+          <button
+          class="side-action dark-side"
+          data-open-modal="importCsvModal"
+          type="button"
+        >
+          Import CSV
+        </button>
+
+          <a href="{{ url_for('export_csv') }}" class="side-action secondary-side">
+            Export CSV
+          </a>
+
+        <button
+          class="side-action danger-side"
+          data-open-modal="clearHistoryModal"
+          type="button"
+        >
+          Clear History
+        </button>
+
+        </div>
+
+      </div>
+
+      <button
+        class="side-info-btn"
+        data-open-modal="dashboardInfo"
+        type="button"
+      >
+        i
+      </button>
+
+      <div class="charts-container">
+        <div class="chart-card">
+          <h3>Risk Category Distribution</h3>
+
+          <div class="chart-bars">
+            <div class="chart-row">
+              <span>Legitimate</span>
+
+              <div class="bar-bg">
+                <div
+                  id="legitimateBar"
+                  class="bar legitimate-bar"
+                  style="width: {{ legitimate_percent }}%;"
+                ></div>
+              </div>
+
+              <span id="legitimateCount">{{ legitimate_count }}</span>
+            </div>
+
+            <div class="chart-row">
+              <span>Suspicious</span>
+
+              <div class="bar-bg">
+                <div
+                  id="suspiciousBar"
+                  class="bar suspicious-bar"
+                  style="width: {{ suspicious_percent }}%;"
+                ></div>
+              </div>
+
+              <span id="suspiciousCount">{{ suspicious_count }}</span>
+            </div>
+
+            <div class="chart-row">
+              <span>High Risk</span>
+
+              <div class="bar-bg">
+                <div
+                  id="highRiskBar"
+                  class="bar highrisk-bar"
+                  style="width: {{ high_risk_percent }}%;"
+                ></div>
+              </div>
+
+              <span id="highRiskCount">{{ high_risk_count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card live-chart-card">
+        <div class="live-chart-header">
+          <div>
+            <h3>Live Transaction Monitoring</h3>
+            <p id="liveStatusText">Live monitoring is active.</p>
+          </div>
+
+          <div class="live-chart-actions">
+          <button
+            type="button"
+            id="startLiveBtn"
+            class="live-btn start-live-btn"
+          >
+            Start
+          </button>
+
+        <button
+          type="button"
+          id="stopLiveBtn"
+          class="live-btn stop-live-btn"
+        >
+          Stop
+        </button>
+          </div>
+        </div>
+
+        <div class="chart-info-box" id="chartInfoBox">
+          Hover over a transaction point to view details.
+        </div>
+
+      <div class="live-chart-wrapper">
+        <div class="external-y-label">Risk Score</div>
+
+        <div class="live-chart-scroll">
+          <canvas id="liveRiskChart"></canvas>
+        </div>
+      </div>
+
+      <div class="external-x-label">
+        Recent Transaction IDs
+      </div>
+      </div>
+
+      <div id="transactions"></div>
+
+      <h2>Recent Transactions</h2>
+
+      <div class="filter-card">
+        <form
+          method="GET"
+          action="{{ url_for('dashboard') }}"
+          class="filter-form"
+        >
+          <input
+            type="text"
+            name="search"
+            placeholder="Search transactions"
+            value="{{ search_query }}"
+          />
+
+          <select name="category">
+            <option
+              value="All Risk Categories"
+              {% if selected_category == "All Risk Categories" %}selected{% endif %}
+            >
+              All Risk Categories
+            </option>
+
+            <option
+              value="Legitimate"
+              {% if selected_category == "Legitimate" %}selected{% endif %}
+            >
+              Legitimate
+            </option>
+
+            <option
+              value="Suspicious"
+              {% if selected_category == "Suspicious" %}selected{% endif %}
+            >
+              Suspicious
+            </option>
+
+            <option
+              value="High Risk"
+              {% if selected_category == "High Risk" %}selected{% endif %}
+            >
+              High Risk
+            </option>
+          </select>
+
+          <button type="submit" class="btn">Apply Filters</button>
+
+          <a href="{{ url_for('dashboard') }}" class="btn secondary-btn">
+            Show All
+          </a>
+        </form>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>DB ID</th>
+            <th>Amount</th>
+            <th>Card</th>
+            <th>Transaction Email</th>
+            <th>Customer Email</th>
+            <th>Risk Score</th>
+            <th>Category</th>
+            <th>Admin Alert</th>
+            <th>Customer Alert</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+
+        <tbody id="recentTransactionsBody">
+          {% for t in transactions %}
+          <tr id="transaction-row-{{ t.id }}">
+            <td>{{ t.id }}</td>
+            <td>{{ t.transaction_amt }}</td>
+            <td>{{ t.card1 }}</td>
+            <td>{{ t.email }}</td>
+            <td>{{ t.customer_email }}</td>
+            <td>{{ t.risk_score }}</td>
+
+            <td>
+              <span
+                class="risk-badge {% if t.risk_category == 'Legitimate' %}badge-legitimate{% elif t.risk_category == 'Suspicious' %}badge-suspicious{% elif t.risk_category == 'High Risk' %}badge-high-risk{% endif %}"
+              >
+                {{ t.risk_category }}
+              </span>
+            </td>
+
+            <td>{% if t.email_alert_sent %}Sent{% else %}-{% endif %}</td>
+            <td>{% if t.customer_alert_sent %}Sent{% else %}-{% endif %}</td>
+
+            <td>
+              {% if t.risk_factors %}
+              <details class="details-dropdown">
+                <summary>View details</summary>
+
+                <ul>
+                  {% for factor in t.risk_factors.split(", ") %}
+                  <li>{{ factor }}</li>
+                  {% endfor %}
+                </ul>
+              </details>
+              {% else %}
+              -
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% if total_pages > 1 %}
+      <div class="pagination">
+        {% if page > 1 %}
+        <a
+          href="{{ url_for('dashboard', page=page-1, search=search_query, category=selected_category) }}#transactions"
+        >
+          Previous
+        </a>
+        {% endif %}
+
+        <form class="page-jump-form">
+          <input type="hidden" name="search" value="{{ search_query }}" />
+          <input type="hidden" name="category" value="{{ selected_category }}" />
+
+          <span>Page</span>
+
+          <input
+            type="text"
+            min="1"
+            max="{{ total_pages }}"
+            value="{{ page }}"
+            class="page-input"
+            id="pageInput"
+          />
+
+          <span>of {{ total_pages }}</span>
+        </form>
+
+        {% if page < total_pages %}
+        <a
+          href="{{ url_for('dashboard', page=page+1, search=search_query, category=selected_category) }}#transactions"
+        >
+          Next
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div id="dashboardInfo" class="modal-overlay">
+      <div class="modal-box">
+      <button
+        class="modal-close-x"
+        data-close-modal="dashboardInfo"
+        type="button"
+      >
+        ×
+      </button>
+
+        <h3>Dashboard Metrics Explained</h3>
+
+        <ul>
+          <li>
+            <strong>Total Transactions:</strong> total number of analyzed
+            transactions stored in the database.
+          </li>
+          <li>
+            <strong>Average Risk Score:</strong> average fraud risk score across
+            all stored transactions. Range: 0 to 100.
+          </li>
+          <li>
+            <strong>Alerts Sent:</strong> number of transactions for which an
+            admin or customer alert was sent.
+          </li>
+          <li>
+            <strong>High Risk Rate:</strong> percentage of transactions
+            classified as High Risk.
+          </li>
+          <li>
+            <strong>Risk Category Distribution:</strong> visual count of
+            Legitimate, Suspicious, and High Risk transactions.
+          </li>
+          <li>
+            <strong>Live Transaction Monitoring:</strong> simulates a stream of
+            incoming transactions and stores each analyzed transaction in the
+            database.
+          </li>
+        </ul>
+
+        <p><strong>Risk score ranges:</strong></p>
+
+        <ul class="risk-range-list">
+          <li><strong>Legitimate:</strong> below 30</li>
+          <li><strong>Suspicious:</strong> 30 to 69.99</li>
+          <li><strong>High Risk:</strong> 70 or above</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="importCsvModal" class="modal-overlay">
+      <div class="modal-box small-modal">
+        <button
+          class="modal-close-x"
+          data-close-modal="importCsvModal"
+          type="button"
+        >
+          ×
+        </button>
+
+        <h3>Import Historical Transactions</h3>
+
+        <p>
+          Upload an IEEE-CIS transaction CSV file. The system will process a
+          random sample and store the results in the monitoring database.
+        </p>
+
+        <form
+          id="importCsvForm"
+          method="POST"
+          action="{{ url_for('import_csv') }}"
+          enctype="multipart/form-data"
+          class="import-modal-form"
+        >
+          <label class="modal-file-label">
+            Choose CSV file
+          <input
+            id="csvFileInput"
+            type="file"
+            name="csv_file"
+            accept=".csv"
+            required
+          />
+          </label>
+
+          <p id="selectedFileName" class="selected-file-name">
+            No CSV file selected.
+          </p>
+
+          <p id="importLoadingMessage" class="import-loading-message">
+            Processing CSV file. Please wait...
+          </p>
+
+          <button id="importCsvSubmitBtn" type="submit" class="btn import-btn">
+            Apply Import
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div id="clearHistoryModal" class="modal-overlay">
+    <div class="modal-box small-modal">
+      <button
+        class="modal-close-x"
+        data-close-modal="clearHistoryModal"
+        type="button"
+      >
+        ×
+      </button>
+
+      <h3>Clear Transaction History</h3>
+
+      <p>
+        Are you sure you want to delete all stored transactions from the database?
+        This action cannot be undone.
+      </p>
+
+      <div class="confirm-actions">
+        <button
+          type="button"
+          class="btn secondary-btn"
+          data-close-modal="clearHistoryModal"
+        >
+          Cancel
+        </button>
+
+        <form method="POST" action="{{ url_for('clear_history') }}">
+          <button type="submit" class="btn danger-confirm-btn">
+            Yes, Clear History
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/shared/modals.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+  {% include 'footer.html' %}
+</body>
+</html>

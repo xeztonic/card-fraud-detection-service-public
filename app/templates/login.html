@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection Login</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/main.css') }}"
+    />
+</head>
+
+<body class="login-body">
+
+    <!-- Login page header -->
+    <header class="login-page-header">
+        <div class="login-header-left">
+            <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="Fraud Detection Logo"
+                class="header-logo"
+            >
+            <span class="login-header-section">Log In</span>
+        </div>
+
+        <div class="login-header-center">
+            <h1>Suspicious Card Transaction Detection and Notification Service</h1>
+        </div>
+
+        <div class="login-header-right"></div>
+    </header>
+
+    <!-- Login main content -->
+    <main class="login-page-main">
+        <div class="login-container">
+
+            <h2>Fraud Detection System</h2>
+
+            <form method="POST" class="login-form">
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    required
+                >
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                >
+
+                <button type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            {% if error %}
+                <p class="error-message">{{ error }}</p>
+            {% endif %}
+
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+</body>
+</html>

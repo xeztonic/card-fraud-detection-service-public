@@ -1,0 +1,20 @@
+.dashboard-container {
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.page-logo {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    display: block;
+    background: transparent;
+    border-radius: 0;
+}

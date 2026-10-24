@@ -1,0 +1,139 @@
+.side-menu {
+    position: fixed;
+    top: 50%;
+    left: -260px;
+    transform: translateY(-50%);
+    width: 260px;
+    background: #ffffff;
+    border-radius: 0 18px 18px 0;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22);
+    z-index: 900;
+    transition: left 0.35s ease;
+}
+
+.side-menu:hover {
+    left: 0;
+}
+
+.side-menu-tab {
+    position: absolute;
+    right: -52px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 120px;
+    background: #111827;
+    border-radius: 0 18px 18px 0;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side-menu-tab span {
+    transform: rotate(-90deg);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.side-menu-content {
+    padding: 24px;
+}
+
+.side-menu-content h4 {
+    margin: 0 0 18px;
+    color: #111827;
+}
+
+.side-action,
+.side-file-label {
+    width: 100%;
+    display: block;
+    text-align: center;
+    padding: 13px 16px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    box-sizing: border-box;
+}
+
+.primary-side {
+    background: #2563eb;
+    color: white;
+}
+
+.dark-side {
+    background: #111827;
+    color: white;
+}
+
+.secondary-side {
+    background: #374151;
+    color: white;
+}
+
+.danger-side {
+    background: #dc2626;
+    color: white;
+}
+
+.primary-side:hover {
+    background: #1d4ed8;
+}
+
+.dark-side:hover {
+    background: #020617;
+}
+
+.secondary-side:hover {
+    background: #1f2937;
+}
+
+.danger-side:hover {
+    background: #b91c1c;
+}
+
+.side-file-label {
+    background: #f9fafb;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.side-file-label:hover {
+    background: #f3f4f6;
+}
+
+.side-file-label input {
+    display: none;
+}
+
+.side-form {
+    margin: 0;
+}
+
+.side-info-btn,
+.info-btn {
+    position: fixed;
+    top: calc(50% + 75px);
+    left: 9px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    z-index: 899;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+.side-info-btn:hover,
+.info-btn:hover {
+    background-color: #1d4ed8;
+    cursor: pointer;
+}

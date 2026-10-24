@@ -1,0 +1,50 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Flask cache / instance
+instance/
+*.log
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded files
+data/uploads/*
+
+# Exported files
+data/transactions_export.csv
+app/transactions_export.csv
+
+# Large datasets
+data/dataset-ieee/
+data/dataset-ULB/
+
+# Large model files (stored as .7z archives instead)
+models/random_forest_model.pkl
+notebooks/*.pkl
+
+# Jupyter / training artifacts
+.ipynb_checkpoints/
+catboost_info/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

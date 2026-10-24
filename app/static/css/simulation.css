@@ -1,0 +1,108 @@
+.simulation-layout {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.simulation-form {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    display: grid;
+    gap: 15px;
+    max-width: 500px;
+}
+
+.simulation-form input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+.simulation-form button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #2563eb;
+    color: white;
+}
+
+.preset-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.preset-buttons button {
+    background-color: #111827;
+}
+
+.preset-buttons button:hover {
+    background-color: #374151;
+}
+
+.form-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.result-panel {
+    width: 100%;
+}
+
+.result-card,
+.empty-result {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.result-card {
+    margin-top: 0;
+    max-width: none;
+}
+
+.empty-result {
+    color: #4b5563;
+}
+
+.result-legitimate {
+    border-left: 6px solid #16a34a;
+}
+
+.result-suspicious {
+    border-left: 6px solid #f59e0b;
+}
+
+.result-high-risk {
+    border-left: 6px solid #dc2626;
+}
+
+.risk-factors {
+    margin-top: 24px;
+    padding: 18px;
+    background: #fff4e5;
+    border-left: 5px solid #f59e0b;
+    border-radius: 10px;
+}
+
+.risk-factors h4 {
+    margin-bottom: 12px;
+    color: #92400e;
+}
+
+.risk-factors ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.risk-factors li {
+    margin-bottom: 8px;
+    color: #78350f;
+    font-weight: 500;
+}

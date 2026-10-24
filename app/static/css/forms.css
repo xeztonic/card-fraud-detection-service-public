@@ -1,0 +1,87 @@
+.filter-card {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+.filter-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-form input,
+.filter-form select {
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.filter-form input {
+    min-width: 260px;
+}
+
+.filter-form select {
+    min-width: 220px;
+}
+
+.page-jump-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-input::-webkit-outer-spin-button,
+.page-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.page-input {
+    width: 30px;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    appearance: textfield;
+}
+
+.file-upload-label {
+    background-color: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    font-weight: 600;
+}
+
+.file-upload-label input {
+    display: none;
+}
+
+/* Import CSV loading message */
+.import-loading-message {
+    display: none;
+    margin: 0;
+    padding: 10px 12px;
+    text-align: center;
+    color: #1e3a8a;
+    background: #dbeafe;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* Visible loading state */
+.import-loading-message.active {
+    display: block;
+}
+
+/* Disabled import button while CSV is processing */
+.import-btn:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}

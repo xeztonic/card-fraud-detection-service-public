@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulate Transaction</title>
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='images/logo.png') }}"
+  />
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/main.css') }}"
+  />
+</head>
+
+<body data-simulate-url="{{ url_for('simulate') }}">
+  <!-- Page navbar -->
+  <div class="navbar">
+    <div class="page-title">
+      <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="Fraud Detection Logo"
+        class="page-logo"
+      />
+
+      <h2>Simulate Transaction</h2>
+    </div>
+
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+  </div>
+
+  <!-- Side actions menu -->
+  <div class="side-menu">
+    <div class="side-menu-tab">
+      <span>Actions</span>
+    </div>
+
+    <div class="side-menu-content">
+      <h4>Page Actions</h4>
+
+      <a href="{{ url_for('dashboard') }}" class="side-action primary-side">
+        Dashboard
+      </a>
+
+      <button
+        class="side-action dark-side"
+        data-open-modal="importCsvModal"
+        type="button"
+      >
+        Import CSV
+      </button>
+
+      <a href="{{ url_for('export_csv') }}" class="side-action secondary-side">
+        Export CSV
+      </a>
+
+      <button
+        class="side-action danger-side"
+        data-open-modal="clearHistoryModal"
+        type="button"
+      >
+        Clear History
+      </button>
+    </div>
+  </div>
+
+  <!-- Page information button -->
+  <button
+    class="side-info-btn"
+    data-open-modal="simulateInfo"
+    type="button"
+  >
+    i
+  </button>
+
+  <!-- Simulation page content -->
+  <div class="dashboard-container">
+    <div class="simulation-layout">
+      <form method="POST" class="simulation-form">
+        <!-- Preset examples -->
+        <div class="preset-buttons">
+          <button id="legitimateExampleBtn" type="button">
+            Legitimate Example
+          </button>
+
+          <button id="suspiciousExampleBtn" type="button">
+            Suspicious Example
+          </button>
+
+          <button id="highRiskExampleBtn" type="button">
+            High Risk Example
+          </button>
+        </div>
+
+        <!-- Transaction input fields -->
+        <input
+          id="TransactionAmt"
+          type="number"
+          step="0.01"
+          name="TransactionAmt"
+          placeholder="Transaction Amount"
+          value="{{ request.form.get('TransactionAmt', '') }}"
+          required
+        />
+
+        <input
+          id="TransactionDT"
+          type="number"
+          name="TransactionDT"
+          placeholder="Transaction Time"
+          value="{{ request.form.get('TransactionDT', '') }}"
+          required
+        />
+
+        <input
+          id="card1"
+          type="number"
+          name="card1"
+          placeholder="Card Identifier"
+          value="{{ request.form.get('card1', '') }}"
+          required
+        />
+
+        <input
+          id="card2"
+          type="number"
+          name="card2"
+          placeholder="Card Secondary Identifier"
+          value="{{ request.form.get('card2', '') }}"
+        />
+
+        <input
+          id="card4"
+          type="text"
+          name="card4"
+          placeholder="Card Type"
+          value="{{ request.form.get('card4', '') }}"
+        />
+
+        <input
+          id="addr1"
+          type="number"
+          name="addr1"
+          placeholder="Address Region"
+          value="{{ request.form.get('addr1', '') }}"
+        />
+
+        <input
+          id="P_emaildomain"
+          type="text"
+          name="P_emaildomain"
+          placeholder="Transaction Email Domain"
+          value="{{ request.form.get('P_emaildomain', '') }}"
+        />
+
+        <input
+          id="dist1"
+          type="number"
+          step="0.01"
+          name="dist1"
+          placeholder="Distance"
+          value="{{ request.form.get('dist1', '') }}"
+        />
+
+        <input
+          id="ProductCD"
+          type="text"
+          name="ProductCD"
+          placeholder="Product Code"
+          value="{{ request.form.get('ProductCD', '') }}"
+        />
+
+        <input
+          id="customer_email"
+          type="email"
+          name="customer_email"
+          placeholder="Customer Email"
+          value="{{ request.form.get('customer_email', '') }}"
+        />
+
+        <!-- Form action buttons -->
+        <div class="form-actions">
+          <button type="submit">
+            Analyze Transaction
+          </button>
+
+          <button
+            id="resetSimulationFormBtn"
+            type="button"
+            class="refresh-btn"
+          >
+            Refresh Form
+          </button>
+        </div>
+      </form>
+
+      <!-- Prediction result panel -->
+      <div class="result-panel">
+        {% if prediction %}
+        <div
+          class="result-card {% if prediction.risk_category == 'Legitimate' %}result-legitimate{% elif prediction.risk_category == 'Suspicious' %}result-suspicious{% elif prediction.risk_category == 'High Risk' %}result-high-risk{% endif %}"
+        >
+          <h3>Prediction Result</h3>
+
+          <p>
+            <strong>Base ML Probability:</strong>
+            {{ prediction.base_ml_score }}%
+          </p>
+
+          <p>
+            <strong>Behavioral Risk Adjustment:</strong>
+            +{{ prediction.behavioral_adjustment }}
+          </p>
+
+          <p>
+            <strong>Final Risk Score:</strong>
+            {{ prediction.final_risk_score }} / 100
+          </p>
+
+          <p>
+            <strong>Risk Category:</strong>
+            <span
+              class="risk-badge {% if prediction.risk_category == 'Legitimate' %}badge-legitimate{% elif prediction.risk_category == 'Suspicious' %}badge-suspicious{% elif prediction.risk_category == 'High Risk' %}badge-high-risk{% endif %}"
+            >
+              {{ prediction.risk_category }}
+            </span>
+          </p>
+
+          {% if prediction.email_alert_sent %}
+          <p class="alert-success">
+            Email alert sent successfully to the fraud monitoring administrator.
+          </p>
+          {% endif %}
+
+          {% if prediction.customer_alert_sent %}
+          <p class="alert-success">
+            Customer security notification sent successfully to the cardholder.
+          </p>
+          {% endif %}
+
+          {% if prediction.risk_factors %}
+          <div class="risk-factors">
+            <h4>Risk Factors Detected</h4>
+
+            <ul>
+              {% for factor in prediction.risk_factors %}
+              <li>{{ factor }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="empty-result">
+          <h3>No Transaction Analyzed</h3>
+
+          <p>
+            Fill in the transaction details or use one of the preset examples
+            to generate a fraud risk prediction.
+          </p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Simulation information modal -->
+  <div id="simulateInfo" class="modal-overlay">
+    <div class="modal-box">
+      <button
+        class="modal-close-x"
+        data-close-modal="simulateInfo"
+        type="button"
+      >
+        ×
+      </button>
+
+      <h3>Transaction Simulation Fields</h3>
+
+      <ul>
+        <li>
+          <strong>Transaction Amount:</strong> transaction value. In the IEEE-CIS
+          dataset, the currency is anonymized, so it is treated as a generic
+          monetary amount.
+        </li>
+
+        <li>
+          <strong>Transaction Time:</strong> relative transaction timestamp from
+          the dataset, not an actual date.
+        </li>
+
+        <li>
+          <strong>Card Identifier:</strong> anonymized card-related feature, not
+          the real card number.
+        </li>
+
+        <li>
+          <strong>Card Secondary Identifier:</strong> additional anonymized card
+          feature.
+        </li>
+
+        <li>
+          <strong>Card Type:</strong> card network/type, for example visa,
+          mastercard, discover.
+        </li>
+
+        <li>
+          <strong>Address Region:</strong> anonymized address/region feature.
+        </li>
+
+        <li>
+          <strong>Transaction Email Domain:</strong> email domain used in the
+          transaction, for example gmail.com.
+        </li>
+
+        <li>
+          <strong>Distance:</strong> distance-related behavioral feature. Higher
+          values may indicate unusual transaction behavior.
+        </li>
+
+        <li>
+          <strong>Product Code:</strong> anonymized transaction product category.
+          Possible values include W, C, H, R, and S. Their exact meaning is not
+          publicly disclosed in the dataset.
+        </li>
+
+        <li>
+          <strong>Customer Email:</strong> email address used only for sending the
+          security notification to the cardholder.
+        </li>
+      </ul>
+
+      <h4>Risk Scoring Explained</h4>
+
+      <ul>
+        <li>
+          <strong>Base ML Probability:</strong> raw probability estimated by the
+          trained machine learning model.
+        </li>
+
+        <li>
+          <strong>Behavioral Risk Adjustment:</strong> additional risk added based
+          on transaction amount, distance, email domain, and product type.
+        </li>
+
+        <li>
+          <strong>Final Risk Score:</strong> final score from 0 to 100,
+          calculated from the base ML probability plus behavioral adjustments.
+        </li>
+
+        <li>
+          <strong>Risk Category:</strong> final classification based on the Final
+          Risk Score.
+        </li>
+      </ul>
+
+      <p><strong>Risk score ranges:</strong></p>
+
+      <ul class="risk-range-list">
+        <li><strong>Legitimate:</strong> below 30</li>
+        <li><strong>Suspicious:</strong> 30 to 69.99</li>
+        <li><strong>High Risk:</strong> 70 or above</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Import CSV modal -->
+  <div id="importCsvModal" class="modal-overlay">
+    <div class="modal-box small-modal">
+      <button
+        class="modal-close-x"
+        data-close-modal="importCsvModal"
+        type="button"
+      >
+        ×
+      </button>
+
+      <h3>Import Historical Transactions</h3>
+
+      <p>
+        Upload an IEEE-CIS transaction CSV file. The system will process a random
+        sample and store the results in the monitoring database.
+      </p>
+
+      <form
+        id="importCsvForm"
+        method="POST"
+        action="{{ url_for('import_csv') }}"
+        enctype="multipart/form-data"
+        class="import-modal-form"
+      >
+        <label class="modal-file-label">
+          Choose CSV file
+
+          <input
+            id="csvFileInput"
+            type="file"
+            name="csv_file"
+            accept=".csv"
+            required
+          />
+        </label>
+
+        <p id="selectedFileName" class="selected-file-name">
+          No CSV file selected.
+        </p>
+
+        <p id="importLoadingMessage" class="import-loading-message">
+          Processing CSV file. Please wait...
+        </p>
+
+        <button id="importCsvSubmitBtn" type="submit" class="btn import-btn">
+          Apply Import
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Clear history confirmation modal -->
+  <div id="clearHistoryModal" class="modal-overlay">
+    <div class="modal-box small-modal">
+      <button
+        class="modal-close-x"
+        data-close-modal="clearHistoryModal"
+        type="button"
+      >
+        ×
+      </button>
+
+      <h3>Clear Transaction History</h3>
+
+      <p>
+        Are you sure you want to delete all stored transactions from the database?
+        This action cannot be undone.
+      </p>
+
+      <div class="confirm-actions">
+        <button
+          type="button"
+          class="btn secondary-btn"
+          data-close-modal="clearHistoryModal"
+        >
+          Cancel
+        </button>
+
+        <form method="POST" action="{{ url_for('clear_history') }}">
+          <button type="submit" class="btn danger-confirm-btn">
+            Yes, Clear History
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% include 'footer.html' %}
+
+  <script src="{{ url_for('static', filename='js/shared/modals.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/simulate.js') }}"></script>
+</body>
+</html>
